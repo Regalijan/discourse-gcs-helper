@@ -198,7 +198,7 @@ after_initialize do
               },
               condition: {
                 age: days,
-                prefix: [prefix]
+                matchesPrefix: [prefix]
               }
             }
           ]
