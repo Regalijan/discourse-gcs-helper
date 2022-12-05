@@ -11,9 +11,6 @@ require 'json'
 require 'jwt'
 require 'net/http'
 
-require_dependency 'file_store/s3_store'
-require_dependency 's3_helper'
-
 after_initialize do
   module GCSHelper
     @access_token
