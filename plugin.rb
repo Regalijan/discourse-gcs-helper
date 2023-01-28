@@ -15,6 +15,7 @@ after_initialize do
   module GCSHelper
     @access_token
     @access_token_expiration = 0
+
     def self.compose_multipart_object(key, bucket, access_token)
       uri = URI("https://storage.googleapis.com/storage/v1/b/#{bucket}/o/#{CGI.escape(key)}")
       response = Net::HTTP.start uri.host, uri.port, use_ssl: true do |http|
@@ -31,17 +32,17 @@ after_initialize do
       obj_to_compose = JSON.parse(response.body)
       compose_uri = URI("https://storage.googleapis.com/storage/v1/b/#{bucket}/o/#{CGI.escape(key)}/compose")
       compose_response = Net::HTTP.post compose_uri, {
-                                                  kind: 'storage#compose',
-                                                  sourceObjects: [
-                                                    {
-                                                      name: key
-                                                    }
-                                                  ],
-                                                  destination: obj_to_compose
-                                                }.to_json, {
-                       'authorization' => "Bearer #{access_token}",
-                       'content-type' => 'application/json'
-                     }
+        kind: 'storage#compose',
+        sourceObjects: [
+          {
+            name: key
+          }
+        ],
+        destination: obj_to_compose
+      }.to_json, {
+                                          'authorization' => "Bearer #{access_token}",
+                                          'content-type' => 'application/json'
+                                        }
 
       unless compose_response.is_a?(Net::HTTPSuccess)
         raise "Failed to compose object: #{compose_response.body}"
@@ -69,14 +70,13 @@ after_initialize do
 
       access_token_response = Net::HTTP.post_form(
         URI('https://oauth2.googleapis.com/token'),
-       {
-         'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-         'assertion' => jwt
-       }
+        {
+          'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          'assertion' => jwt
+        }
       )
 
-      raise "Google returned an error: #{access_token_response.body}" unless
-        access_token_response.is_a?(Net::HTTPSuccess)
+      raise "Google returned an error: #{access_token_response.body}" unless access_token_response.is_a?(Net::HTTPSuccess)
 
       data = JSON.parse(access_token_response.body)
       @access_token = data['access_token']
@@ -134,17 +134,17 @@ after_initialize do
         source.include?(multisite_upload_path) ||
         source.include?(@tombstone_prefix)
 
-        source
-      elsif @s3_bucket_folder_path
-        folder, filename = source.split("/", 2)
+              source
+            elsif @s3_bucket_folder_path
+              folder, filename = source.split("/", 2)
 
-        File.join(folder, multisite_upload_path, filename)
-      else
-        File.join(multisite_upload_path, source)
-      end
+              File.join(folder, multisite_upload_path, filename)
+            else
+              File.join(multisite_upload_path, source)
+            end
 
       access_token = GCSHelper.get_access_token
-      rewrite_res = GCSHelper.rewrite_request(key, destination, @s3_bucket_name, access_token, options)
+      rewrite_res = GCSHelper.rewrite_request(key, destination, @s3_bucket_name, access_token, options: options)
 
       unless rewrite_res.is_a?(Net::HTTPSuccess)
         begin
@@ -161,7 +161,7 @@ after_initialize do
         end
 
         GCSHelper.compose_multipart_object key, @s3_bucket_name, access_token
-        rewrite_res = GCSHelper.rewrite_request(key, destination, @s3_bucket_name, access_token, options)
+        rewrite_res = GCSHelper.rewrite_request(key, destination, @s3_bucket_name, access_token, options: options)
       end
 
       [
