@@ -156,7 +156,10 @@ after_initialize do
         # At the moment, Google does not support rewriting objects uploaded via multipart
         # Those objects must be composed first before they can be rewritten
         # Google returns the 'invalid' code for those objects
-        unless error_code == 'invalid'
+        # As for 404s, since these would otherwise be copied to tombstone we can simply skip over them
+        unless error_code == 'invalid' or
+          not error_code == 'notFound'
+
           raise "Google returned an error: #{rewrite_res.body}"
         end
 
