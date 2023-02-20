@@ -157,9 +157,7 @@ after_initialize do
         # Those objects must be composed first before they can be rewritten
         # Google returns the 'invalid' code for those objects
         # As for 404s, since these would otherwise be copied to tombstone we can simply skip over them
-        unless error_code == 'invalid' or
-          error_code != 'notFound'
-
+        unless ['invalid', 'notFound'].include?(error_code)
           raise "Google returned an error: #{rewrite_res.body}"
         end
 
