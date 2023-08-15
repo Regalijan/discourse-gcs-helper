@@ -3,8 +3,8 @@
 # name: discourse-gcs-helper
 # about: Helper plugin for Discourse and Google Cloud Storage
 # version: 0.0.1
-# author: Wolftallemo
-# url: https://github.com/Wolftallemo/discourse-gcs-helper
+# author: Regalijan
+# url: https://github.com/Regalijan/discourse-gcs-helper
 
 require 'cgi'
 require 'json'
