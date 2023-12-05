@@ -147,6 +147,9 @@ after_initialize do
       rewrite_res = GCSHelper.rewrite_request(key, destination, @s3_bucket_name, access_token, options: options)
 
       unless rewrite_res.is_a?(Net::HTTPSuccess)
+        # Object does not exist for whatever reason
+        return [destination, ''] if rewrite_res.is_a?(Net::HTTPNotFound)
+
         begin
           error_code = JSON.parse(rewrite_res.body)['error']['errors'][0]['reason']
         rescue
