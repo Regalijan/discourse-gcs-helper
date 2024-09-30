@@ -3,7 +3,7 @@
 # name: discourse-gcs-helper
 # about: Helper plugin for Discourse and Google Cloud Storage
 # version: 0.0.1
-# author: Regalijan
+# authors: Regalijan
 # url: https://github.com/Regalijan/discourse-gcs-helper
 
 require 'cgi'
